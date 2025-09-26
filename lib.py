@@ -69,7 +69,7 @@ def lookup_suggestions(spellcheck_word, dict):
     return suggestions
 
 # The complexity of this approach is O(n) where n is the number of edits because hash lookups are O(1)
-def lookup_suggestions_omptimized(spellcheck_word, dict):
+def lookup_suggestions_optimized(spellcheck_word, dict):
     """Lookup suggestions for a misspelled word."""
     suggestions = set()
     # this is faster because set lookups are O(1)

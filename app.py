@@ -26,7 +26,7 @@ if spellcheck_word in df_correct_words['word'].values:
 else:
     print(
         f"The word '{spellcheck_word}' is most likely misspelled.")
-    suggestions = lookup_suggestions_omptimized(
+    suggestions = lookup_suggestions_optimized(
         spellcheck_word, df_words_freq)
 
     print("The suggestions are: ", suggestions)
