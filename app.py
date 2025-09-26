@@ -12,13 +12,12 @@ path_2 = kagglehub.dataset_download("bwandowando/479k-english-words")
 file_path = os.path.join(path, "unigram_freq.csv")
 file_path2 = os.path.join(path_2, "words_alpha.txt")
 df_words_freq = pd.read_csv(file_path)
-df_word_dict = pd.read_csv(file_path2, names=['word'])
 with open(file_path2, "r") as f:
     valid_words_set = set(line.strip() for line in f)
 
 # Main program
 time_start = pd.Timestamp.now()
-if spellcheck_word in df_word_dict['word'].values:
+if spellcheck_word in valid_words_set:
     print(f"The word '{spellcheck_word}' is spelled correctly.")
 else:
     suggestions = lookup_suggestions_optimized(spellcheck_word, valid_words_set)
