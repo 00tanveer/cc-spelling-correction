@@ -7,11 +7,9 @@ spellcheck_word = sys.argv[1]
 
 # Set the path to the file you'd like to load
 path = kagglehub.dataset_download("rtatman/english-word-frequency")
-path_2 = kagglehub.dataset_download("bwandowando/479k-english-words")
 
 # List files in the downloaded directory
 files = os.listdir(path)
-files_2 = os.listdir(path_2)
 
 file_path = os.path.join(path, "unigram_freq.csv")
 df = pd.read_csv(file_path)
@@ -86,10 +84,7 @@ if spellcheck_word in df['word'].values:
 else:
     print(
         f"The word '{spellcheck_word}' is most likely misspelled.")
-    suggestions = lookup_suggestions_optimized(
-        spellcheck_word, df_words_freq)
-
-    print("The suggestions are: ", suggestions)
+    print("The suggestions are: ", lookup_suggetions_optimized(spellcheck_word))
     time_end = pd.Timestamp.now()
     print("Time taken:", time_end - time_start)
 
