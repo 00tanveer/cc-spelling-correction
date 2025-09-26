@@ -69,18 +69,18 @@ def lookup_suggestions(spellcheck_word, dict):
     return suggestions
 
 # The complexity of this approach is O(n) where n is the number of edits because hash lookups are O(1)
-def lookup_suggestions_optimized(spellcheck_word, dict):
+def lookup_suggestions_optimized(spellcheck_word, word_set):
     """Lookup suggestions for a misspelled word."""
     suggestions = set()
     # this is faster because set lookups are O(1)
-    df_words_set = set(dict['word'].values)
+    # df_words_set = set(dict['word'].values)
     for edit in lev_1_edits(spellcheck_word):
-        if edit in df_words_set:
+        if edit in word_set:
             suggestions.add(edit)
     # if suggestions is empty then do lev_2_edits
     if not suggestions:
         edits_2 = lev_2_edits(spellcheck_word)
         for edit in edits_2:
-            if edit in df_words_set:
+            if edit in word_set:
                 suggestions.add(edit)
     return suggestions
