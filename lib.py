@@ -72,11 +72,9 @@ def lookup_suggestions(spellcheck_word, dict):
 def lookup_suggestions_omptimized(spellcheck_word, dict):
     """Lookup suggestions for a misspelled word."""
     suggestions = set()
-    edits = (deletion(spellcheck_word) + insertion(spellcheck_word) +
-             replacement(spellcheck_word) + transposition(spellcheck_word))
     # this is faster because set lookups are O(1)
     df_words_set = set(dict['word'].values)
-    for edit in edits:
+    for edit in lev_1_edits(spellcheck_word):
         if edit in df_words_set:
             suggestions.add(edit)
     # if suggestions is empty then do lev_2_edits
