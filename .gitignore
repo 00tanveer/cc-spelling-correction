@@ -1,1 +1,2 @@
-venv/
+# Ignore the virtual environment folder
+spelling-correction_env/
