@@ -1,7 +1,5 @@
 # Instroduction
-This is a coding challenge (number 98) by John Crickett. The prompt is to create my own spelling correction tool, learn about different approaches and try to do my best to document my learnings. I'm using a word frequency dataset ([the English word frequency dataset](https://www.kaggle.com/datasets/rtatman/english-word-frequency?resource=download) from Kaggle) and an English word list dataset ([Dataset containing 479k words](https://www.kaggle.com/datasets/bwandowando/479k-english-words?select=words_alpha.txt)). 
-
-Do note that the word frequency dataset also contains highly frequent misspelled words. So, we will need to first use the authoritaive English word dataset to first assess whether any input is an incorrect spelling. Then, I use the word frequency dataset to figure out what the top suggestions should be.
+This is a coding challenge (number 98) by John Crickett. The prompt is to create my own spelling correction tool, learn about different approaches and try to do my best to document my learnings. I'm using a word frequency database ([the English word frequency dataset](https://www.kaggle.com/datasets/rtatman/english-word-frequency?resource=download) from Kaggle) match the word inputs.
 
 # Program structure
 This is a command line program written in Python. The main program is contained in the `app.py` file. Instructions to run this program:
@@ -20,12 +18,5 @@ Insertion can deal with characters missing. `hring -> hiring`
 Replacement and deletion can deal with incorrect characters. `barryster -> barrister barristerr -> barrister`
 Transposition deals with letters swapped. `barritser -> barrister`
 
-## Two letter transformations - Levenshtein distance (ld)=2
-We can do this by:
-1. coming up with all ld=1 edits of the incorrect spelling first. 
-2. Then, doing another round of transformation on all the edits from the previous procedure.
-
 ## Performance
 Once the transofmations are done, we can do the lookup of the words in the word frequency table in 2 ways.
-1. List lookup. O(n*m), n is the length of the input word, m is the size of the dictionary
-2. Hash lookup, O(n*1)
