@@ -29,3 +29,7 @@ We can do this by:
 Once the transofmations are done, we can do the lookup of the words in the word frequency table in 2 ways.
 1. List lookup. O(n*m), n is the length of the input word, m is the size of the dictionary
 2. Hash lookup, O(n*1)
+
+The performance is tested by
+Time : 0.278s 11.9 words per second, 
+The time it takes to suggest the correct spelling and the number of words the program can correct per second.
