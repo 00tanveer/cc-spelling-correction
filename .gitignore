@@ -1,2 +1,4 @@
 # Ignore the virtual environment folder
 spelling-correction_env/
+test.py
+__pycache__/

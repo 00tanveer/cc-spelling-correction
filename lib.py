@@ -1,19 +1,3 @@
-import kagglehub
-import os
-import pandas as pd
-import sys
-
-spellcheck_word = sys.argv[1]
-
-# Set the path to the file you'd like to load
-path = kagglehub.dataset_download("rtatman/english-word-frequency")
-
-# List files in the downloaded directory
-files = os.listdir(path)
-
-file_path = os.path.join(path, "unigram_freq.csv")
-df = pd.read_csv(file_path)
-
 # Spellcheker library functions
 
 # Deletion complexity is O(n)
@@ -53,45 +37,50 @@ def transposition(spellcheck_word):
                      spellcheck_word[i] + spellcheck_word[i+2:])
     return edits
 
+def lev_1_edits(spellcheck_word):
+    """Create edits that are one edit away from the original word."""
+    return (deletion(spellcheck_word) + insertion(spellcheck_word) +
+            replacement(spellcheck_word) + transposition(spellcheck_word))
+
+# The complexity is O(n^2 * 26^2) which is quite high
+def lev_2_edits(spellcheck_word):
+    """Create edits that are two edits away from the original word."""
+    edits = set()
+    for edit1 in (deletion(spellcheck_word) + insertion(spellcheck_word) +
+                  replacement(spellcheck_word) + transposition(spellcheck_word)):
+        for edit2 in (deletion(edit1) + insertion(edit1) +
+                      replacement(edit1) + transposition(edit1)):
+            edits.add(edit2)
+    return edits
+
 # The complexity of this approach is O(n*m) where n is the number of edits and m is the number of words in the dataframe
-def lookup_suggetions(spellcheck_word):
+def lookup_suggestions(spellcheck_word, dict):
     """Lookup suggestions for a misspelled word."""
     suggestions = set()
-    for edit in (deletion(spellcheck_word) + insertion(spellcheck_word) +
-                 replacement(spellcheck_word) + transposition(spellcheck_word)):
+    for edit in lev_1_edits(spellcheck_word):
         # this is slower because list lookups are O(n)
-        if edit in df['word'].values:
+        if edit in dict['word'].values:
             suggestions.add(edit)
+    # if suggestions is empty then do lev_2_edits
+    if not suggestions:
+        for edit in lev_2_edits(spellcheck_word):
+            if edit in dict['word'].values:
+                suggestions.add(edit)
     return suggestions
 
 # The complexity of this approach is O(n) where n is the number of edits because hash lookups are O(1)
-def lookup_suggetions_optimized(spellcheck_word):
+def lookup_suggestions_optimized(spellcheck_word, dict):
     """Lookup suggestions for a misspelled word."""
     suggestions = set()
-    edits = (deletion(spellcheck_word) + insertion(spellcheck_word) +
-             replacement(spellcheck_word) + transposition(spellcheck_word))
     # this is faster because set lookups are O(1)
-    df_words_set = set(df['word'].values)
-    for edit in edits:
+    df_words_set = set(dict['word'].values)
+    for edit in lev_1_edits(spellcheck_word):
         if edit in df_words_set:
             suggestions.add(edit)
+    # if suggestions is empty then do lev_2_edits
+    if not suggestions:
+        edits_2 = lev_2_edits(spellcheck_word)
+        for edit in edits_2:
+            if edit in df_words_set:
+                suggestions.add(edit)
     return suggestions
-
-# Main program
-time_start = pd.Timestamp.now()
-if spellcheck_word in df['word'].values:
-    print(f"The word '{spellcheck_word}' is spelled correctly.")
-else:
-    print(
-        f"The word '{spellcheck_word}' is most likely misspelled.")
-    print("The suggestions are: ", lookup_suggetions_optimized(spellcheck_word))
-    time_end = pd.Timestamp.now()
-    print("Time taken:", time_end - time_start)
-
-# calculate frequency of words[] in df and sort by frequency
-words_df = df[df['word'].isin(lookup_suggetions_optimized(spellcheck_word))].sort_values(
-    by='count', ascending=False)
-print("Did you mean this word?")
-# print the topmost suggestion
-if not words_df.empty:
-    print(words_df.iloc[0]['word'])
