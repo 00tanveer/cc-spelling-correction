@@ -69,18 +69,24 @@ def lookup_suggestions(spellcheck_word, dict):
     return suggestions
 
 # The complexity of this approach is O(n) where n is the number of edits because hash lookups are O(1)
-def lookup_suggestions_optimized(spellcheck_word, word_set):
-    """Lookup suggestions for a misspelled word."""
+def levenshtein_distance_suggestion(spellcheck_word, words_set, df_words_freq):
     suggestions = set()
     # this is faster because set lookups are O(1)
     # df_words_set = set(dict['word'].values)
     for edit in lev_1_edits(spellcheck_word):
-        if edit in word_set:
+        if edit in words_set:
             suggestions.add(edit)
     # if suggestions is empty then do lev_2_edits
     if not suggestions:
         edits_2 = lev_2_edits(spellcheck_word)
         for edit in edits_2:
-            if edit in word_set:
+            if edit in words_set:
                 suggestions.add(edit)
-    return suggestions
+    top_suggestions = df_words_freq[df_words_freq['word'].isin(suggestions)].sort_values(
+        by='count', ascending=False)
+    # print the topmost suggestion
+    if not top_suggestions.empty:
+        top_most_suggestion = top_suggestions.iloc[0]['word']
+        return top_most_suggestion
+
+# using trigrams to find suggestions

@@ -12,6 +12,7 @@ path_2 = kagglehub.dataset_download("bwandowando/479k-english-words")
 file_path = os.path.join(path, "unigram_freq.csv")
 file_path2 = os.path.join(path_2, "words_alpha.txt")
 df_words_freq = pd.read_csv(file_path)
+words_freq_set = set(df_words_freq['word'].values)
 with open(file_path2, "r") as f:
     valid_words_set = set(line.strip() for line in f)
 
@@ -20,16 +21,10 @@ time_start = pd.Timestamp.now()
 if spellcheck_word in valid_words_set:
     print(f"The word '{spellcheck_word}' is spelled correctly.")
 else:
-    suggestions = lookup_suggestions_optimized(spellcheck_word, valid_words_set)
-    # print(f"The word '{spellcheck_word}' is most likely misspelled.")
-    # calculate frequency of words[] in df and sort by frequency
-    words_df = df_words_freq[df_words_freq['word'].isin(suggestions)].sort_values(
-        by='count', ascending=False)
-    # print("Did you mean this word?")
-    # print the topmost suggestion
-    if not words_df.empty:
-        print(words_df.iloc[0]['word'])
-        #time_taken in seconds
-        time_end = pd.Timestamp.now()
-        time_taken = time_end - time_start # Time taken: 0 days 00:00:00.086797
-        print(f"Time: {time_taken.total_seconds():.3f}s {1/time_taken.total_seconds():.2f} words per second")
+    # Using Levenshtein distance to find suggestions
+    suggestion = levenshtein_distance_suggestion(spellcheck_word, valid_words_set, df_words_freq)
+    print(suggestion)
+    time_end = pd.Timestamp.now()
+    time_taken = time_end - time_start # Time taken: 0 days 00:00:00.086797
+    print(f"Time: {time_taken.total_seconds():.3f}s {1/time_taken.total_seconds():.2f} words per second")
+    
