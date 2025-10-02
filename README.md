@@ -33,3 +33,19 @@ Once the transofmations are done, we can do the lookup of the words in the word 
 The performance is tested by
 Time : 0.278s 11.9 words per second, 
 The time it takes to suggest the correct spelling and the number of words the program can correct per second.
+
+### Insights
+1. Levenshtein distance=1 lookups are much faster. O(n), n=number of one-character edits required
+2. Levenshtein distance=2 lookups are much slower. O(n^2 * a^2), n=number of one-character edits required and a=number of alphabets
+3. Using trigrams, the complexity of the function I wrote can be broken down these major cost functions:
+    - Building trigrams for the spelled word -> O(m), m=len(spellcheck_word)
+    - Looking up candidate word sets from inverted trigram index. O(t), t=number of unique trigrams in the misspelled word
+    - U is the union set of all correct words that share the trigrams from the misspelled word
+    - For each candidate word in U, we iterate over all trigrams (t) to see how trigrams are common between the two. Worst case complexity is O(U*t)
+    - Finally, we sort the candidates according to their frequency in the word frequencies dataset. That's O(UlogU) for the sorting function in Python.
+    - So, the overall complexity is O(m+t+U*t+UlogU).
+    - Approximated, that's O(U(1+logU)), U=uniot set of all correct English words
+    - We could conclude that the complexity using trigrams to find the correct spelling depends on the size of the text corpus.
+
+# next steps
+Build a distribution of the nature of spelling mistakes.
