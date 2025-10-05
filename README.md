@@ -1,4 +1,4 @@
-# Instroduction
+# Introduction
 This is a coding challenge (number 98) by John Crickett. The prompt is to create my own spelling correction tool, learn about different approaches and try to do my best to document my learnings. I'm using a word frequency dataset ([the English word frequency dataset](https://www.kaggle.com/datasets/rtatman/english-word-frequency?resource=download) from Kaggle) and an English word list dataset ([Dataset containing 479k words](https://www.kaggle.com/datasets/bwandowando/479k-english-words?select=words_alpha.txt)). 
 
 Do note that the word frequency dataset also contains highly frequent misspelled words. So, we will need to first use the authoritaive English word dataset to first assess whether any input is an incorrect spelling. Then, I use the word frequency dataset to figure out what the top suggestions should be. It's a reliable heuristic that from words that have the same Levenshtein distances or the same trigram coverage, the likeliest correctly spelled word suggestion is the one that occurs the most in any text corpus.
