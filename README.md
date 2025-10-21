@@ -56,9 +56,12 @@ Time : 0.278s 11.9 words per second
     - So, the overall complexity is O(m+t+U*t+UlogU).
     - Approximated, that's O(U(1+logU)), U=uniot set of all correct English words
     - We could conclude that the complexity using trigrams to find the correct spelling depends on the size of the text corpus.
+4. Using tries + Levenshtein, we only explore branches of the word that partially match prefixes, pruning massive portions of the search tree. So, let's say for incorrectly misspelled word "bevevolent", we won't find Levenshtein edits for bexe.. or bexx. In principle, we are avoiding combinatorial explosion.
+    - In theory, the complexity tends to O(L * B^E), where L = average length of the query word, B = average number of child nodes per node (roughly how many letter we can branch to at each step) and E = allowed edit distance
 
 # Next steps for me
 - Build a distribution of the nature of spelling mistakes.
 - Combine Levenshtein and trigrams
+- Combine trigrams with tries
 - Benchmark against difference performance measures
-- Launch a Python module
+- Publish as a package in pip

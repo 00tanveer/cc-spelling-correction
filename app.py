@@ -2,7 +2,7 @@ import kagglehub
 import os
 import pandas as pd
 import sys
-from lib import *
+from core.lib import *
 
 spellcheck_word = sys.argv[1]
 

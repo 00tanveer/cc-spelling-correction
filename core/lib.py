@@ -4,12 +4,18 @@ import os
 import pandas as pd
 from collections import Counter
 from typing import Iterable, Iterator, Optional
+from core.trie import Trie
 
 path = kagglehub.dataset_download("rtatman/english-word-frequency")
 file_path = os.path.join(path, "unigram_freq.csv")
 df_words_freq = pd.read_csv(file_path)
 
-with open('inverted_trigram_index.json', 'r') as f:
+path_2 = kagglehub.dataset_download("bwandowando/479k-english-words")
+file_path2 = os.path.join(path_2, 'words_alpha.txt')
+with open(file_path2, 'r') as f:
+    valid_words = set(line.strip() for line in f)
+
+with open('core/inverted_trigram_index.json', 'r') as f:
     inverted_trigram_index = json.load(f)
 
 # Spellcheker library functions
@@ -167,6 +173,73 @@ def trigram_suggestion(spellcheck_word, freq_map, inverted_trigram_index=inverte
         top_most_suggestion = top_3[0][0]
         return top_most_suggestion
 
+############## Spell check using tries ###############
+import time
+trie = Trie()
+# insert all dictionary words
+for word in valid_words:
+    trie.insert(word)
+# start = time.time()
+# print(trie.search('beautifull'))
+# end = time.time()
+# print(f'Time taken by trie: {(end-start):.8f}s')
+# start = time.time()
+# print(word in valid_words)
+# end = time.time()
+# print(f'Time taken by in operator: {(end-start):.8f}s')
+
+def search_trie_with_levenshtein(trie, word, max_edit=2):
+    """
+    Find all words in the trie within a given edit distance of 'word'.
+    """
+
+    results = []
+
+    # Recursive DFS
+    def dfs(node, prefix, previous_row):
+        """
+        node: current TrieNode
+        prefix: prefix formed so far
+        previous_row: list representing previous row of Levenshtein DP matrix
+        """
+        columns = len(word) + 1
+        current_row = [previous_row[0] + 1]
+
+        # Build current row of DP matrix (Levenshtein distance row)
+        for column in range(1, columns):
+            insert_cost = current_row[column - 1] + 1
+            delete_cost = previous_row[column] + 1
+            replace_cost = previous_row[column - 1] + (0 if word[column - 1] == prefix[-1] else 1)
+            current_row.append(min(insert_cost, delete_cost, replace_cost))
+
+        # If last cell <= max_edit and node is a word, collect it
+        if current_row[-1] <= max_edit and node.is_end:
+            results.append((prefix, current_row[-1]))
+
+        # If any value in current_row ≤ max_edit, we can still explore deeper
+        if min(current_row) <= max_edit:
+            for char, child in node.children.items():
+                dfs(child, prefix + char, current_row)
+
+    # Initialize DP row for empty prefix
+    initial_row = list(range(len(word) + 1))
+
+    # Start DFS for each child of root
+    for char, node in trie.root.children.items():
+        dfs(node, char, initial_row)
+    print("Results AREEEEE: ", results)
+    return sorted(results, key=lambda x: (x[1], x[0]))
+start = time.time()
+query = "bevebolent"
+results = search_trie_with_levenshtein(trie, query, max_edit=2)   
+end = time.time()
+print(f'Time taken by in operator: {(end-start):.8f}s {(1/(end-start)):.2f} words per second')
+print(f"Suggestions for '{query}':")
+print(results)
+for word, dist in results:
+    print(f"  {word} (distance={dist})")
+
+#########################
 def trigram_suggestion_chatgpt(spellcheck_word, freq_map, inverted_trigram_index=inverted_trigram_index):
     # normalize
     q = spellcheck_word.casefold()
@@ -212,8 +285,6 @@ def trigram_suggestion_chatgpt(spellcheck_word, freq_map, inverted_trigram_index
 
     # return best single suggestion (keep your API)
     return ranked[0][0] if ranked else None
-
-#########################
 
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
 
