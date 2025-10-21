@@ -9,7 +9,7 @@ path = kagglehub.dataset_download("rtatman/english-word-frequency")
 file_path = os.path.join(path, "unigram_freq.csv")
 df_words_freq = pd.read_csv(file_path)
 
-with open('inverted_trigram_index.json', 'r') as f:
+with open('core/inverted_trigram_index.json', 'r') as f:
     inverted_trigram_index = json.load(f)
 
 # Spellcheker library functions
@@ -167,6 +167,8 @@ def trigram_suggestion(spellcheck_word, freq_map, inverted_trigram_index=inverte
         top_most_suggestion = top_3[0][0]
         return top_most_suggestion
 
+
+#########################
 def trigram_suggestion_chatgpt(spellcheck_word, freq_map, inverted_trigram_index=inverted_trigram_index):
     # normalize
     q = spellcheck_word.casefold()
@@ -212,8 +214,6 @@ def trigram_suggestion_chatgpt(spellcheck_word, freq_map, inverted_trigram_index
 
     # return best single suggestion (keep your API)
     return ranked[0][0] if ranked else None
-
-#########################
 
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
 
